@@ -3,5 +3,5 @@ export default function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <main className="w-full h-auto">{children}</main>;
+  return <main className="w-full h-auto px-3 lg:px-0">{children}</main>;
 }
