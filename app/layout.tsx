@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { Inter, Jost } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const jost = Jost({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
-})
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 const inter = Inter({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
-})
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 export const metadata: Metadata = {
   title: "xCanvas - AI Mobile Design Agent",
@@ -26,7 +27,14 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${jost.className} ${inter.className} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
