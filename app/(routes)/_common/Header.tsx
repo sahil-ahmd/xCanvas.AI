@@ -3,13 +3,24 @@
 import Logo from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MoonIcon, SunIcon } from "lucide-react";
+import { LoginLink, LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function Header() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
+  const { user } = useKindeBrowserClient();
 
   return (
     <div className="sticky top-0 right-0 left-0 z-30">
@@ -26,17 +37,48 @@ function Header() {
               <SunIcon
                 className={cn(
                   "absolute h-5 w-5 transition",
-                  isDark ? "scale-100" : "scale-0"
+                  isDark ? "scale-100" : "scale-0",
                 )}
               />
               <MoonIcon
                 className={cn(
                   "absolute h-5 w-5 transition",
-                  isDark ? "scale-0" : "scale-100"
+                  isDark ? "scale-0" : "scale-100",
                 )}
               />
             </Button>
-            <Button>Log in</Button>
+
+            {/** show user if login or login button */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="cursor-pointer">
+                  <Avatar className="h-8 w-8 shrink-0 rounded-full">
+                    <AvatarImage
+                      src={user?.picture || ""}
+                      alt={user?.given_name || ""}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {user?.given_name?.charAt(0)}
+                      {user?.family_name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <LogoutLink className="w-full flex items-center gap-2">
+                      <LogOutIcon className="size-4" />
+                      Logout
+                    </LogoutLink>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <LoginLink>
+                <Button>Log in</Button>
+              </LoginLink>
+            )}
           </div>
         </div>
       </header>
