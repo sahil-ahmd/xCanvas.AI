@@ -24,7 +24,7 @@ function PromptInput({
 }: PromptInputProps) {
   return <div className="bg-background">
     <InputGroup
-      className={cn("min-h-[172px] rounded-3xl bg-background", className && className)}
+      className={cn("min-h-[132px] md:min-h-[172px] rounded-3xl bg-background", className && className)}
     >
       <InputGroupTextarea
         className="text-base! py-2.5!"
