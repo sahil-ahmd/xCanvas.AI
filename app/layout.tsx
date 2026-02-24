@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Jost } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { QueryProvider } from "@/context/query-provider";
 
 const jost = Jost({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -27,14 +28,16 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${jost.className} ${inter.className} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -4,43 +4,60 @@ import { useState } from "react";
 import PromptInput from "@/components/prompt-input";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import Header from "./Header";
+import { useCreateProject, useGetProjects } from "@/hooks/use-project";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { Spinner } from "@/components/ui/spinner";
+import { ProjectType } from "@/types/project";
+import { ProjectCard } from "@/components/project-card";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 function LandingScreen() {
+  const { user } = useKindeBrowserClient();
   const [promptText, setPromptText] = useState<string>("");
+  const userId = user?.id;
+
+  const { mutate, isPending } = useCreateProject();
+  const { data: projects, isLoading, isError } = useGetProjects(userId);
 
   const suggestions = [
     {
       label: "Finance Tracker",
       icon: "💰", // You can use an Emoji, a Lucide icon component, or an SVG path
       value: `Finance app statistics screen. Current balance at top with dollar amount, 
-              bar chart showing spending over months (Oct-Mar) with month selector 
-              pills below, transaction list with app icons and color-coded amounts.`,
+      bar chart showing spending over months (Oct-Mar) with month selector 
+      pills below, transaction list with app icons and color-coded amounts.`,
     },
     {
       label: "SaaS Analytics",
       icon: "📈",
       value: `SaaS dashboard layout. Large KPI cards at the top for MRR, Churn, and ARPU. 
-              Central multi-line chart showing growth vs target. Right sidebar with 
-              'Recent Events' feed and user geographic heatmap at the bottom.`,
+      Central multi-line chart showing growth vs target. Right sidebar with 
+      'Recent Events' feed and user geographic heatmap at the bottom.`,
     },
     {
       label: "Health Monitor",
       icon: "❤️",
       value: `Fitness tracking interface. Circular progress rings for daily steps and 
-              calories. Area chart for resting heart rate over 24 hours. Grid of 
-              mini-charts for sleep cycles (REM, Light, Deep) with sleep score at center.`,
+      calories. Area chart for resting heart rate over 24 hours. Grid of 
+      mini-charts for sleep cycles (REM, Light, Deep) with sleep score at center.`,
     },
     {
       label: "Crypto Portfolio",
       icon: "🪙",
       value: `Dark mode crypto wallet. Candlestick chart for BTC/USD price action. 
-              Horizontal bar chart for asset allocation (BTC, ETH, SOL). Live ticker 
-              tape at the bottom with percentage change indicators in green and red.`,
+      Horizontal bar chart for asset allocation (BTC, ETH, SOL). Live ticker 
+      tape at the bottom with percentage change indicators in green and red.`,
     },
   ];
 
   const handleSuggestionClick = (val: string) => {
     setPromptText(val);
+  };
+
+  const handleSubmit = () => {
+    if (!promptText) return;
+    mutate(promptText);
   };
 
   return (
@@ -66,8 +83,8 @@ function LandingScreen() {
                   className="ring-2 ring-primary rounded-3xl"
                   promptText={promptText}
                   setPromptText={setPromptText}
-                  isLoading={false}
-                  onSubmit={() => {}}
+                  isLoading={isPending}
+                  onSubmit={handleSubmit}
                 />
               </div>
 
@@ -101,11 +118,37 @@ function LandingScreen() {
         {/** Recent Projects */}
         <div className="w-full py-10">
           <div className="mx-auto max-w-3xl">
-            <div>
-              <h1 className="font-medium text-xl tracking-tight">
-                Recent Projects
-              </h1>
-            </div>
+            {userId && (
+              <div>
+                <h1 className="font-medium text-xl tracking-tight">
+                  Recent Projects
+                </h1>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Spinner className="size-10" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                    {projects?.map((project: ProjectType) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isError && (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-3 py-5">
+                <Image
+                  src="/failed.svg"
+                  alt="failed-to-load"
+                  width={100}
+                  height={100}
+                />
+                <p className="text-foreground/70 text-sm md:text-base font-medium">Sorry, Failed to load Projects right now.</p>
+                <Button variant="secondary">Try Again</Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
