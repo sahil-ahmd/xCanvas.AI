@@ -4,43 +4,50 @@ import { useState } from "react";
 import PromptInput from "@/components/prompt-input";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import Header from "./Header";
+import { useCreateProject } from "@/features/use-project";
 
 function LandingScreen() {
   const [promptText, setPromptText] = useState<string>("");
+  const { mutate, isPending } = useCreateProject();
 
   const suggestions = [
     {
       label: "Finance Tracker",
       icon: "💰", // You can use an Emoji, a Lucide icon component, or an SVG path
       value: `Finance app statistics screen. Current balance at top with dollar amount, 
-              bar chart showing spending over months (Oct-Mar) with month selector 
-              pills below, transaction list with app icons and color-coded amounts.`,
+      bar chart showing spending over months (Oct-Mar) with month selector 
+      pills below, transaction list with app icons and color-coded amounts.`,
     },
     {
       label: "SaaS Analytics",
       icon: "📈",
       value: `SaaS dashboard layout. Large KPI cards at the top for MRR, Churn, and ARPU. 
-              Central multi-line chart showing growth vs target. Right sidebar with 
-              'Recent Events' feed and user geographic heatmap at the bottom.`,
+      Central multi-line chart showing growth vs target. Right sidebar with 
+      'Recent Events' feed and user geographic heatmap at the bottom.`,
     },
     {
       label: "Health Monitor",
       icon: "❤️",
       value: `Fitness tracking interface. Circular progress rings for daily steps and 
-              calories. Area chart for resting heart rate over 24 hours. Grid of 
-              mini-charts for sleep cycles (REM, Light, Deep) with sleep score at center.`,
+      calories. Area chart for resting heart rate over 24 hours. Grid of 
+      mini-charts for sleep cycles (REM, Light, Deep) with sleep score at center.`,
     },
     {
       label: "Crypto Portfolio",
       icon: "🪙",
       value: `Dark mode crypto wallet. Candlestick chart for BTC/USD price action. 
-              Horizontal bar chart for asset allocation (BTC, ETH, SOL). Live ticker 
-              tape at the bottom with percentage change indicators in green and red.`,
+      Horizontal bar chart for asset allocation (BTC, ETH, SOL). Live ticker 
+      tape at the bottom with percentage change indicators in green and red.`,
     },
   ];
 
   const handleSuggestionClick = (val: string) => {
     setPromptText(val);
+  };
+
+  const handleSubmit = () => {
+    if (!promptText) return;
+    mutate(promptText);
   };
 
   return (
@@ -66,8 +73,8 @@ function LandingScreen() {
                   className="ring-2 ring-primary rounded-3xl"
                   promptText={promptText}
                   setPromptText={setPromptText}
-                  isLoading={false}
-                  onSubmit={() => {}}
+                  isLoading={isPending}
+                  onSubmit={handleSubmit}
                 />
               </div>
 
