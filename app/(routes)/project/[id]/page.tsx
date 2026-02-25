@@ -2,6 +2,8 @@
 
 import { useGetProjectById } from "@/hooks/use-project-id";
 import { useParams } from "next/navigation";
+import Header from "./_common/Header";
+import Canvas from "@/components/canvas";
 
 function Page() {
   const params = useParams();
@@ -17,7 +19,14 @@ function Page() {
     )
   }
   return (
-    <div>Page</div>
+    <div className="relative h-screen w-full flex flex-col">
+      <Header projectName={project?.name} />
+      <div className="flex w-fit overflow-hidden">
+        <div className="relative">
+          <Canvas />
+        </div>
+      </div>
+    </div>
   )
 }
 

@@ -6,7 +6,7 @@ export const useGetProjectById = (projectId: string) => {
     queryKey: ["project", projectId],
     queryFn: async () => {
       const res = await axios.get(`/api/project/${projectId}`);
-      return res.data.data;
+      return res.data;
     },
     enabled: !!projectId,
   });
