@@ -2,6 +2,9 @@
 
 import { useGetProjectById } from "@/hooks/use-project-id";
 import { useParams } from "next/navigation";
+import Header from "./_common/Header";
+import Canvas from "@/components/canvas";
+import { CanvasProvider } from "@/context/canvas-provider";
 
 function Page() {
   const params = useParams();
@@ -9,7 +12,8 @@ function Page() {
 
   const { data: project, isPending } = useGetProjectById(id);
   const frames = project?.frames || [];
-  const theme = project?.theme || "";
+  const themeId = project?.theme || "";
+  const hasInitialData = frames.length > 0;
 
   if (!isPending && !project) {
     return (
@@ -17,7 +21,26 @@ function Page() {
     )
   }
   return (
-    <div>Page</div>
+    <div className="relative h-screen w-full flex flex-col">
+      <Header projectName={project?.name} />
+      
+      <CanvasProvider
+        initialFrames={frames}
+        initialThemeId={themeId}
+        hasInitialData={hasInitialData}
+        projectId={project?.id}
+      >
+        <div className="flex flex-1 overflow-hidden">
+        <div className="relative flex-1">
+          <Canvas
+            projectId={project?.id}
+            projectName={project?.name}
+            isPending={isPending}
+          />
+        </div>
+      </div>
+      </CanvasProvider>
+    </div>
   )
 }
 
