@@ -145,7 +145,9 @@ function LandingScreen() {
                   width={100}
                   height={100}
                 />
-                <p className="text-foreground/70 text-sm md:text-base font-medium">Sorry, Failed to load Projects right now.</p>
+                <p className="text-foreground/70 text-sm md:text-base font-medium">
+                  Sorry, Failed to load Projects right now.
+                </p>
                 <Button variant="secondary">Try Again</Button>
               </div>
             )}
