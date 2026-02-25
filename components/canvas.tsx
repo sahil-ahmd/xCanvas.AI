@@ -1,9 +1,11 @@
-import React from 'react'
-
-const Canvas = () => {
-  return (
-    <div>Canvas</div>
-  )
+interface CanvasProps {
+  projectId: string;
+  projectName: string | null;
+  isPending: boolean;
 }
 
-export default Canvas
+const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
+  return <div>Canvas</div>;
+};
+
+export default Canvas;
