@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-type LoadingStatusType =
+export type LoadingStatusType =
   | "idle"
   | "running"
   | "analyzing"

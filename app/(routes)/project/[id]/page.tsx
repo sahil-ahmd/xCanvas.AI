@@ -30,8 +30,8 @@ function Page() {
         hasInitialData={hasInitialData}
         projectId={project?.id}
       >
-        <div className="flex w-fit overflow-hidden">
-        <div className="relative">
+        <div className="flex flex-1 overflow-hidden">
+        <div className="relative flex-1">
           <Canvas
             projectId={project?.id}
             projectName={project?.name}
