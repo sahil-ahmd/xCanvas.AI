@@ -14,7 +14,7 @@ const Header = ({ projectName }: { projectName?: string }) => {
 
   return (
     <div className="sticky top-0">
-      <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm">
+      <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm px-2 md:px-4">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-4">
             <Logo />
@@ -29,27 +29,27 @@ const Header = ({ projectName }: { projectName?: string }) => {
             <p className="max-w-[200px] truncate font-medium">
               {projectName || "Untitled Project"}
             </p>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                className="relative rounded-md h-8 w-8"
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-              >
-                <SunIcon
-                  className={cn(
-                    "absolute h-5 w-5 transition",
-                    isDark ? "scale-100" : "scale-0",
-                  )}
-                />
-                <MoonIcon
-                  className={cn(
-                    "absolute h-5 w-5 transition",
-                    isDark ? "scale-0" : "scale-100",
-                  )}
-                />
-              </Button>
-            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              className="relative rounded-md h-8 w-8"
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+            >
+              <SunIcon
+                className={cn(
+                  "absolute h-5 w-5 transition",
+                  isDark ? "scale-100" : "scale-0",
+                )}
+              />
+              <MoonIcon
+                className={cn(
+                  "absolute h-5 w-5 transition",
+                  isDark ? "scale-0" : "scale-100",
+                )}
+              />
+            </Button>
           </div>
         </div>
       </header>

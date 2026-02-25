@@ -8,10 +8,10 @@ import { CheckIcon } from "lucide-react";
 const ThemeSelector = () => {
   const { themes, theme: currentTheme, setTheme } = useCanvas();
   return (
-    <div className="flex flex-col max-h-96">
+    <div className="flex flex-col max-h-96 w-full">
       <div className="flex-1 pb-2 px-4 overflow-y-auto">
         <h3 className="font-semibold text-sm mb-2">Choose a theme</h3>
-        <div className="py-2 space-y-3">
+        <div className="py-2 space-y-2">
           {themes?.map((theme) => (
             <ThemeItem
               key={theme.id}
@@ -40,7 +40,7 @@ function ThemeItem({
     <button
       onClick={onSelect}
       className={cn(
-        `flex items-center justify-between w-full p-1 rounded-xl border gap-4 bg-background`,
+        `flex items-center justify-between w-68 p-1.5 rounded-lg border gap-4 bg-background`,
         isSelected ? "border-2" : "border",
       )}
       style={{

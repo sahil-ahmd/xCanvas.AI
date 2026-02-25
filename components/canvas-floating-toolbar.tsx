@@ -3,7 +3,7 @@
 import { useCanvas } from "@/context/canvas-provider";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
-import { ChevronDown, Palette, Wand2 } from "lucide-react";
+import { CameraIcon, ChevronDown, Palette, Save, Wand2 } from "lucide-react";
 import { useState } from "react";
 import PromptInput from "./prompt-input";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,10 @@ const CanvasFloatingToolbar = () => {
   const [promptText, setPromptText] = useState<string>("");
 
   return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2">
-      <div className="w-full max-w-2xl bg-background dark:bg-neutral-950 rounded-full shadow-xl border">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-40">
+      <div className="w-full max-w-2xl bg-background dark:bg-neutral-900 rounded-full shadow-xl border dark:border-neutral-700">
         <div className="flex flex-row items-center gap-2 px-3">
+          {/** Magic wand with Input Box */}
           <Popover>
             <PopoverTrigger>
               <Button
@@ -39,7 +40,7 @@ const CanvasFloatingToolbar = () => {
               </Button>
             </PopoverContent>
           </Popover>
-
+          {/** Theme section */}
           <Popover>
             <PopoverTrigger>
               <div className="flex items-center gap-2 px-3 py-2">
@@ -68,16 +69,34 @@ const CanvasFloatingToolbar = () => {
                     );
                   })}
                 </div>
-                <div className="flex items-center gap-1 text-sm">
+                <div className="flex items-center gap-1 text-sm cursor-pointer">
                   +{themes?.length - 4} more
                   <ChevronDown className="size-4" />
                 </div>
               </div>
             </PopoverTrigger>
-            <PopoverContent className="px-2 rounded-xl shadow border">
+            <PopoverContent className="px-2 rounded-xl shadow border w-full">
               <ThemeSelector />
             </PopoverContent>
           </Popover>
+          {/** Camera and Save Button */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              className="rounded-full cursor-pointer"
+            >
+              <CameraIcon className="size-4.5" />
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              className="rounded-full cursor-pointer"
+            >
+              <Save className="size-4" />
+              Save
+            </Button>
+          </div>
         </div>
       </div>
     </div>
