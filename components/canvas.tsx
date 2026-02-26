@@ -126,10 +126,8 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                 contentStyle={{
                     width: "100%",
                     height: "100%",
-                    background: "red"
                   }}
                 >
-                  <div className="size-50 bg-blue-500">Box</div>
                   <DeviceFrame
                     frameId="demo"
                     title="Demo Screen"
