@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas";
 import { useCanvas } from "@/context/canvas-provider";
@@ -18,18 +18,18 @@ type PropsType = {
   scale?: number;
   toolMode: ToolModeType;
   theme_style?: string;
-}
+};
 
 const DeviceFrame = ({
-    html,
-    title="Untitled",
-    width=420,
-    minHeight=800,
-    initialPosition={ x: 0, y: 0 },
-    frameId,
-    scale,
-    toolMode,
-    theme_style
+  html,
+  title = "Untitled",
+  width = 420,
+  minHeight = 800,
+  initialPosition = { x: 0, y: 0 },
+  frameId,
+  scale,
+  toolMode,
+  theme_style,
 }: PropsType) => {
   const { selectedFrameId, setSelectedFrameId } = useCanvas();
   const [frameSize, setFrameSize] = useState({ width, height: minHeight });
@@ -38,8 +38,24 @@ const DeviceFrame = ({
   const fullHtml = getHTMLWrapper(html, title, theme_style, frameId);
 
   const Handle = () => {
-    return <div className="z-30 h-4 w-4 bg-white border-2 border-blue-500" />
+    return <div className="z-30 h-4 w-4 bg-white border-2 border-blue-500" />;
   };
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        event.data.type === "FRAME_HEIGHT" &&
+        event.data.frameId === frameId
+      ) {
+        setFrameSize((prev) => ({
+          ...prev,
+          height: event.data.height,
+        }));
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [frameId]);
 
   return (
     <Rnd
@@ -61,7 +77,7 @@ const DeviceFrame = ({
       onClick={(e: any) => {
         e.stopPropagation();
         if (toolMode === TOOL_MODE_ENUM.SELECT) {
-            setSelectedFrameId(frameId);
+          setSelectedFrameId(frameId);
         }
       }}
       resizeHandleComponent={{
@@ -84,8 +100,12 @@ const DeviceFrame = ({
       }}
       className={cn(
         "relative z-10",
-        isSelected && toolMode !== TOOL_MODE_ENUM.HAND && "ring-3 ring-blue-400 ring-offset-1",
-        toolMode === TOOL_MODE_ENUM.HAND ? "cursor-grab! active:cursor-grabbing!" : "cursor-move"
+        isSelected &&
+          toolMode !== TOOL_MODE_ENUM.HAND &&
+          "ring-3 ring-blue-400 ring-offset-1",
+        toolMode === TOOL_MODE_ENUM.HAND
+          ? "cursor-grab! active:cursor-grabbing!"
+          : "cursor-move",
       )}
     >
       <div className="w-full h-full">
@@ -97,10 +117,12 @@ const DeviceFrame = ({
           onDownloadPng={() => {}}
           onOpenHtmlDialog={() => {}}
         />
-        <div className={cn(
+        <div
+          className={cn(
             `relative w-full h-auto shadow-sm rounded-[36px] overflow-hidden`,
-            isSelected && toolMode !== TOOL_MODE_ENUM.HAND && "rounded-none"
-        )}>
+            isSelected && toolMode !== TOOL_MODE_ENUM.HAND && "rounded-none",
+          )}
+        >
           <iframe
             ref={isFrameRef}
             srcDoc={fullHtml}
@@ -119,7 +141,7 @@ const DeviceFrame = ({
         </div>
       </div>
     </Rnd>
-  )
-}
+  );
+};
 
-export default DeviceFrame
+export default DeviceFrame;
