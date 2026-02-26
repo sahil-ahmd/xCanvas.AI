@@ -8,6 +8,7 @@ import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas";
 import CanvasControls from "./canvas-controls";
 import DeviceFrame from "./device-frame";
 import DeviceFrameSkeleton from "./frame-skeleton";
+import HtmlDialog from "./html-dialog";
 
 const DEMO_HTML = `
 <div style="font-family: sans-serif; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
@@ -72,16 +73,21 @@ interface CanvasProps {
 }
 
 const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
-  const { theme, frames, loadingStatus } = useCanvas();
+  const { theme, frames, selectedFrame, loadingStatus } = useCanvas();
   const [toolMode, setToolMode] = useState<ToolModeType>(TOOL_MODE_ENUM.SELECT);
   const [zoomPercent, setZoomPercent] = useState<number>(53);
   const [currentScale, setCurrentScale] = useState<number>(0.53);
+  const [openHtmlDialog, setOpenHtmlDialog] = useState<boolean>(false);
 
   const currentStatus = isPending
     ? "fetching"
     : loadingStatus !== "idle" && loadingStatus !== "completed"
       ? loadingStatus
       : null;
+
+  const onOpenHtmlDialog = () => {
+    setOpenHtmlDialog(true);
+  };
 
   return (
     <>
@@ -137,7 +143,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                     height: "100%",
                   }}
                 >
-                  {/* <div>
+                  <div>
                     {frames?.map((frame, index: number) => {
                       const baseX = 100 + index * 480;
                       const y = 100;
@@ -166,10 +172,11 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                           }}
                           toolMode={toolMode}
                           theme_style={theme?.style}
+                          onOpenHtmlDialog={onOpenHtmlDialog}
                         />
                       );
                     })}
-                  </div> */}
+                  </div>
                   <DeviceFrame
                     frameId="demo"
                     title="Demo Screen"
@@ -178,6 +185,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                     initialPosition={{ x: 1000, y: 100 }}
                     toolMode={toolMode}
                     theme_style={theme?.style}
+                    onOpenHtmlDialog={onOpenHtmlDialog}
                   />
                 </TransformComponent>
               </div>
@@ -192,6 +200,13 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
           )}
         </TransformWrapper>
       </div>
+
+      <HtmlDialog
+        html={selectedFrame?.htmlContent || DEMO_HTML}
+        theme_style={theme?.style}
+        open={openHtmlDialog}
+        onOpenChange={setOpenHtmlDialog}
+      />
     </>
   );
 };

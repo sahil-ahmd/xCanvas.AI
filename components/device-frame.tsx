@@ -18,6 +18,7 @@ type PropsType = {
   scale?: number;
   toolMode: ToolModeType;
   theme_style?: string;
+  onOpenHtmlDialog: () => void;
 };
 
 const DeviceFrame = ({
@@ -30,6 +31,7 @@ const DeviceFrame = ({
   scale,
   toolMode,
   theme_style,
+  onOpenHtmlDialog,
 }: PropsType) => {
   const { selectedFrameId, setSelectedFrameId } = useCanvas();
   const [frameSize, setFrameSize] = useState({ width, height: minHeight });
@@ -115,7 +117,7 @@ const DeviceFrame = ({
           disabled={false}
           isDownloading={false}
           onDownloadPng={() => {}}
-          onOpenHtmlDialog={() => {}}
+          onOpenHtmlDialog={onOpenHtmlDialog}
         />
         <div
           className={cn(
