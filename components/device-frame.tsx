@@ -6,6 +6,7 @@ import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas";
 import { useCanvas } from "@/context/canvas-provider";
 import { getHTMLWrapper } from "@/lib/frame-wrapper";
 import { cn } from "@/lib/utils";
+import FrameToolbar from "./frame-toolbar";
 
 type PropsType = {
   html: string;
@@ -88,7 +89,14 @@ const DeviceFrame = ({
       )}
     >
       <div className="w-full h-full">
-        {/** <FrameToolbar /> */}
+        <FrameToolbar
+          title={title}
+          isSelected={isSelected && toolMode !== TOOL_MODE_ENUM.HAND}
+          disabled={false}
+          isDownloading={false}
+          onDownloading={() => {}}
+          onOpenHtmlDialog={() => {}}
+        />
         <div className={cn(
             `relative w-full h-auto shadow-sm rounded-[36px] overflow-hidden`,
             isSelected && toolMode !== TOOL_MODE_ENUM.HAND && "rounded-none"
