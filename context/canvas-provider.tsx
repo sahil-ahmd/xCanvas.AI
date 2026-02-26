@@ -52,8 +52,9 @@ export const CanvasProvider = ({
     initialThemeId || THEME_LIST[0].id,
   );
   const [frames, setFrames] = useState<FrameType[]>(initialFrames);
-  const [loadingStatus, setLoadingStatus] =
-    useState<LoadingStatusType>("running");
+  const [loadingStatus, setLoadingStatus] = useState<LoadingStatusType>(
+    hasInitialData ? "idle" : "running"
+  );
   const [selectedFrameId, setSelectedFrameId] = useState<string | null>(null);
 
   const theme = THEME_LIST.find((theme) => theme.id === themeId);

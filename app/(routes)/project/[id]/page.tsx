@@ -17,7 +17,7 @@ function Page() {
 
   if (!isPending && !project) {
     return (
-      <div></div>
+      <div>Error</div>
     )
   }
   return (
