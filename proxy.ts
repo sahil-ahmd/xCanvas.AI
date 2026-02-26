@@ -6,7 +6,7 @@ export default withAuth(
   {
     // Middleware still runs on all routes, but doesn't protect the blog route
     isReturnToCurrentPage: true,
-    publicPaths: ["/"],
+    publicPaths: ["/", "/api/inngest"],
   }
 );
 
