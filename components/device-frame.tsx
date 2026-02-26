@@ -94,7 +94,7 @@ const DeviceFrame = ({
           isSelected={isSelected && toolMode !== TOOL_MODE_ENUM.HAND}
           disabled={false}
           isDownloading={false}
-          onDownloading={() => {}}
+          onDownloadPng={() => {}}
           onOpenHtmlDialog={() => {}}
         />
         <div className={cn(

@@ -137,7 +137,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                     height: "100%",
                   }}
                 >
-                  <div>
+                  {/* <div>
                     {frames?.map((frame, index: number) => {
                       const baseX = 100 + index * 480;
                       const y = 100;
@@ -169,7 +169,16 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                         />
                       );
                     })}
-                  </div>
+                  </div> */}
+                  <DeviceFrame
+                    frameId="demo"
+                    title="Demo Screen"
+                    html={DEMO_HTML}
+                    scale={currentScale}
+                    initialPosition={{ x: 1000, y: 100 }}
+                    toolMode={toolMode}
+                    theme_style={theme?.style}
+                  />
                 </TransformComponent>
               </div>
               <CanvasControls
