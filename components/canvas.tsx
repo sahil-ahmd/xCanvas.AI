@@ -7,6 +7,7 @@ import CanvasFloatingToolbar from "./canvas-floating-toolbar";
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas";
 import CanvasControls from "./canvas-controls";
 import DeviceFrame from "./device-frame";
+import DeviceFrameSkeleton from "./frame-skeleton";
 
 const DEMO_HTML = `
 <div style="font-family: sans-serif; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
@@ -36,7 +37,9 @@ const DEMO_HTML = `
       { label: "Spotify", amount: "-$9.99", icon: "🎵" },
       { label: "Salary", amount: "+$3,200.00", icon: "💼" },
       { label: "Amazon", amount: "-$42.50", icon: "📦" },
-    ].map(({ label, amount, icon }) => `
+    ]
+      .map(
+        ({ label, amount, icon }) => `
       <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--card); border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
         <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 20px;">${icon}</span>
@@ -44,14 +47,20 @@ const DEMO_HTML = `
         </div>
         <span style="font-size: 14px; font-weight: 600; color: ${amount.startsWith("+") ? "green" : "var(--foreground)"};">${amount}</span>
       </div>
-    `).join("")}
+    `,
+      )
+      .join("")}
   </div>
 
   <!-- Bottom Nav -->
   <div style="display: flex; justify-content: space-around; padding: 14px; background: var(--card); border-radius: 12px; margin-top: 8px;">
-    ${["🏠", "📊", "💳", "👤"].map(icon => `
+    ${["🏠", "📊", "💳", "👤"]
+      .map(
+        (icon) => `
       <span style="font-size: 22px; cursor: pointer;">${icon}</span>
-    `).join("")}
+    `,
+      )
+      .join("")}
   </div>
 </div>
 `;
@@ -95,7 +104,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
           smooth={true}
           limitToBounds={false}
           panning={{
-            disabled: toolMode !== TOOL_MODE_ENUM.HAND
+            disabled: toolMode !== TOOL_MODE_ENUM.HAND,
           }}
           onTransformed={(ref) => {
             setZoomPercent(Math.round(ref.state.scale * 100));
@@ -109,7 +118,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                   `absolute inset-0 w-full h-full bg-[#eee] dark:bg-[#242423] p-3`,
                   toolMode === TOOL_MODE_ENUM.HAND
                     ? "cursor-grab active:cursor-grabbing"
-                    : "cursor-default"
+                    : "cursor-default",
                 )}
                 style={{
                   backgroundImage:
@@ -122,21 +131,45 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                     width: "100%",
                     height: "100%",
                     overflow: "unset",
-                }}
-                contentStyle={{
+                  }}
+                  contentStyle={{
                     width: "100%",
                     height: "100%",
                   }}
                 >
-                  <DeviceFrame
-                    frameId="demo"
-                    title="Demo Screen"
-                    html={DEMO_HTML}
-                    scale={currentScale}
-                    initialPosition={{ x: 1000, y: 100 }}
-                    toolMode={toolMode}
-                    theme_style={theme?.style}
-                  />
+                  <div>
+                    {frames?.map((frame, index: number) => {
+                      const baseX = 100 + index * 480;
+                      const y = 100;
+
+                      if (frame.isLoading) {
+                        return (
+                          <DeviceFrameSkeleton
+                            key={index}
+                            style={{
+                              transform: `translate(${baseX}px) 100px`
+                            }}
+                          />
+                        )
+                      }
+
+                      return (
+                        <DeviceFrame
+                          key={frame.id}
+                          frameId={frame.id}
+                          title={frame.title}
+                          html={frame.htmlContent}
+                          scale={currentScale}
+                          initialPosition={{ 
+                            x: baseX,
+                            y 
+                          }}
+                          toolMode={toolMode}
+                          theme_style={theme?.style}
+                        />
+                      );
+                    })}
+                  </div>
                 </TransformComponent>
               </div>
               <CanvasControls
