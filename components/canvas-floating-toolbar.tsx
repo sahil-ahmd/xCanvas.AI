@@ -20,7 +20,7 @@ const CanvasFloatingToolbar = () => {
         <div className="flex flex-row items-center gap-2 px-3">
           {/** Magic wand with Input Box */}
           <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
               <Button
                 size="icon-sm"
                 className="px-4 bg-linear-to-r from bg-purple-500 to-indigo-600 text-white rounded-2xl shadow-lg shadow-purple-200/50 cursor-pointer"
@@ -42,7 +42,7 @@ const CanvasFloatingToolbar = () => {
           </Popover>
           {/** Theme section */}
           <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
               <div className="flex items-center gap-2 px-3 py-2">
                 <Palette className="size-4" />
                 <div className="flex gap-1.5">
