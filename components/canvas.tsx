@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-import { useCanvas } from "@/context/canvas-provider";
+import { LoadingStatusType, useCanvas } from "@/context/canvas-provider";
 import CanvasLoader from "./canvas-loader";
 import { cn } from "@/lib/utils";
 import CanvasFloatingToolbar from "./canvas-floating-toolbar";
@@ -79,11 +79,11 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
   const [currentScale, setCurrentScale] = useState<number>(0.53);
   const [openHtmlDialog, setOpenHtmlDialog] = useState<boolean>(false);
 
-  const currentStatus = isPending
-    ? "fetching"
-    : loadingStatus !== "idle" && loadingStatus !== "completed"
-      ? loadingStatus
-      : null;
+  const currentStatus: LoadingStatusType | "fetching" | null = isPending
+  ? "fetching"
+  : loadingStatus !== null && loadingStatus !== "idle" && loadingStatus !== "completed"
+    ? loadingStatus
+    : null;
 
   const onOpenHtmlDialog = () => {
     setOpenHtmlDialog(true);
@@ -153,7 +153,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                           <DeviceFrameSkeleton
                             key={index}
                             style={{
-                              transform: `translate(${baseX}px) 100px`
+                              transform: `translate(${baseX}px, 100px)`
                             }}
                           />
                         )
