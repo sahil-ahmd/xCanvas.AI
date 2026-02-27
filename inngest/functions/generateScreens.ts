@@ -90,7 +90,7 @@ export const generateScreens = inngest.createFunction(
 
       // Use Gemini to analyze the prompt and return structured screen plan + theme
       const { object } = await generateObject({
-        model: openrouter.chat("google/gemini-2.5-flash-lite"),
+        model: openrouter.chat("google/gemini-2.5-flash"),
         schema: AnalysisSchema,
         system: ANALYSIS_PROMPT,
         prompt: analysisPrompt,
@@ -137,7 +137,7 @@ export const generateScreens = inngest.createFunction(
       await step.run(`generated-screen-${i}`, async () => {
         // Generate raw HTML for this screen using Gemini with Unsplash tool support
         const result = await generateText({
-          model: openrouter.chat("google/gemini-2.5-flash-lite"),
+          model: openrouter.chat("google/gemini-2.5-flash"),
           system: GENERATION_SYSTEM_PROMPT,
           tools: {
             searchUnsplash: unsplashTool, // Allows model to fetch real images

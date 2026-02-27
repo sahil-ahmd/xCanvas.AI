@@ -92,7 +92,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
   return (
     <>
       <div className="relative w-full h-full overflow-hidden">
-        <CanvasFloatingToolbar />
+        <CanvasFloatingToolbar projectId={projectId} />
 
         {currentStatus && <CanvasLoader status={currentStatus} />}
 
@@ -177,7 +177,8 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                       );
                     })}
                   </div>
-                  <DeviceFrame
+                  {/** This is only for demo purpose */}
+                  {/* <DeviceFrame
                     frameId="demo"
                     title="Demo Screen"
                     html={DEMO_HTML}
@@ -186,7 +187,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                     toolMode={toolMode}
                     theme_style={theme?.style}
                     onOpenHtmlDialog={onOpenHtmlDialog}
-                  />
+                  /> */}
                 </TransformComponent>
               </div>
               <CanvasControls
