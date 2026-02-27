@@ -30,7 +30,7 @@ interface CanvasContextType {
   selectedFrame: FrameType | null;
   setSelectedFrameId: (id: string | null) => void;
 
-  loadingStatus: LoadingStatusType;
+  loadingStatus: LoadingStatusType | null;
 }
 
 const CanvasContext = createContext<CanvasContextType | undefined>(undefined);
@@ -52,10 +52,18 @@ export const CanvasProvider = ({
     initialThemeId || THEME_LIST[0].id,
   );
   const [frames, setFrames] = useState<FrameType[]>(initialFrames);
-  const [loadingStatus, setLoadingStatus] = useState<LoadingStatusType>(
-    hasInitialData ? "idle" : "running"
+  const [loadingStatus, setLoadingStatus] = useState<LoadingStatusType | null>(
+    hasInitialData ? "idle" : null
   );
   const [selectedFrameId, setSelectedFrameId] = useState<string | null>(null);
+  const [prevProjectId, setPrevProjectId] = useState(projectId);
+
+  if (projectId !== prevProjectId) {
+    setPrevProjectId(projectId);
+    setFrames(initialFrames);
+    setThemeId(initialThemeId || THEME_LIST[0].id);
+    setSelectedFrameId(null);
+  }
 
   const theme = THEME_LIST.find((theme) => theme.id === themeId);
   const selectedFrame =

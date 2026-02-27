@@ -55,16 +55,18 @@ export const generateScreens = inngest.createFunction(
       frames,
       theme: existingTheme,
     } = event.data;
-    const isRegeneration = frames.length > 0;
+    const isExistingGeneration = Array.isArray(frames) && frames.length > 0;
 
     // Analyze and Plan
     const analysis = await step.run("analyze-and-plan-screens", async () => {
-      const contextHTML = frames
-        .slice(0, 4)
-        .map((frame: FrameType) => frame.htmlContent)
-        .join("\n");
+      const contextHTML = isExistingGeneration
+        ? frames
+            .slice(0, 4)
+            .map((frame: FrameType) => frame.htmlContent)
+            .join("\n")
+        : "";
 
-      const analysisPrompt = isRegeneration
+      const analysisPrompt = isExistingGeneration
         ? `
         USER REQUEST: ${prompt}
         SELECTED THEME: ${existingTheme}
@@ -81,9 +83,9 @@ export const generateScreens = inngest.createFunction(
         prompt: analysisPrompt,
       });
 
-      const themeToUse = isRegeneration ? existingTheme : object.theme;
+      const themeToUse = isExistingGeneration ? existingTheme : object.theme;
 
-      if (!isRegeneration) {
+      if (!isExistingGeneration) {
         await prisma.project.update({
           where: {
             id: projectId,
@@ -163,11 +165,10 @@ export const generateScreens = inngest.createFunction(
             projectId,
             title: screenPlan.name,
             htmlContent: finalHtml,
-          }
+          },
         });
 
         return { success: true, frame: frame };
-
       });
     }
   },
