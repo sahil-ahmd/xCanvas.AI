@@ -18,7 +18,7 @@ export const ProjectCard = memo(({ project }: { project: ProjectType }) => {
     <div
       role="button"
       onClick={onRoute}
-      className="w-full flex flex-col border rounded-xl cursor-pointer hover:shadow-md overflow-hidden"
+      className="w-full flex flex-col border rounded-xl cursor-pointer hover:shadow-md dark:hover:border-accent-foreground/20 overflow-hidden"
     >
       <div className="h-40 bg-[#eee] relative overflow-hidden flex items-center justify-center">
         {thumbnail ? (
