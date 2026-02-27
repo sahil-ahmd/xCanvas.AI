@@ -13,7 +13,7 @@ export type FrameType = {
   title: string;
   htmlContent: string;
   projectId?: string;
-  createdAt: Date;
+  createdAt?: Date;
   updatedAt?: Date;
   isLoading?: boolean;
 };
