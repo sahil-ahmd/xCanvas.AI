@@ -23,7 +23,7 @@ function LandingScreen() {
   const suggestions = [
     {
       label: "Finance Tracker",
-      icon: "💰", // You can use an Emoji, a Lucide icon component, or an SVG path
+      icon: "💰",
       value: `Finance app statistics screen. Current balance at top with dollar amount, 
       bar chart showing spending over months (Oct-Mar) with month selector 
       pills below, transaction list with app icons and color-coded amounts.`,
@@ -49,10 +49,111 @@ function LandingScreen() {
       Horizontal bar chart for asset allocation (BTC, ETH, SOL). Live ticker 
       tape at the bottom with percentage change indicators in green and red.`,
     },
+    // E-Commerce
+    {
+      label: "Shop Home",
+      icon: "🛍️",
+      value: `E-commerce home screen. Hero banner with sale promotion, horizontal 
+      category scroll pills, featured products grid with price tags and 
+      rating stars, sticky bottom cart button with item count badge.`,
+    },
+    {
+      label: "Product Detail",
+      icon: "📦",
+      value: `Product detail page. Full-width image carousel at top, product name 
+      and price with discount badge, size selector pills, color swatches, 
+      reviews summary with star breakdown bars, sticky Add to Cart button.`,
+    },
+    // Social
+    {
+      label: "Social Feed",
+      icon: "📱",
+      value: `Social media feed screen. Stories row at top with avatar rings, 
+      post cards with user info, image, like/comment/share actions, 
+      floating compose button, bottom tab navigation.`,
+    },
+    {
+      label: "User Profile",
+      icon: "👤",
+      value: `User profile screen. Cover photo with overlapping avatar, follower 
+      and following counts, bio section, highlight story bubbles, 
+      3-column photo grid, sticky follow button at top.`,
+    },
+    // Productivity
+    {
+      label: "Task Manager",
+      icon: "✅",
+      value: `Task management screen. Progress summary card at top showing completed 
+      vs total tasks, kanban-style columns (Todo, In Progress, Done), 
+      task cards with priority color tags, due dates and assignee avatars.`,
+    },
+    {
+      label: "Calendar",
+      icon: "📅",
+      value: `Calendar app screen. Month view grid with event dots, selected day 
+      highlighted with primary color, scrollable event list below with 
+      time blocks and color-coded categories, floating add event button.`,
+    },
+    // Food & Travel
+    {
+      label: "Food Delivery",
+      icon: "🍔",
+      value: `Food delivery home screen. Location header with search bar, 
+      promo banner carousel, restaurant category icons row, nearby 
+      restaurant cards with rating, delivery time and minimum order, 
+      bottom navigation with cart badge.`,
+    },
+    {
+      label: "Travel Booking",
+      icon: "✈️",
+      value: `Flight booking screen. Search form with origin/destination swap button, 
+      date range picker, passenger counter, popular destination cards 
+      with background images and price tags, recent searches list.`,
+    },
+    // Music & Entertainment
+    {
+      label: "Music Player",
+      icon: "🎵",
+      value: `Music player screen. Large album art with blur background effect, 
+      song title and artist, waveform progress bar with timestamps, 
+      shuffle/previous/play/next/repeat controls, lyrics toggle, 
+      queue preview at bottom.`,
+    },
+    {
+      label: "Streaming App",
+      icon: "🎬",
+      value: `Video streaming home screen. Featured content hero with play button 
+      and metadata overlay, continue watching horizontal scroll row, 
+      trending now grid with thumbnail cards, genre filter pills, 
+      bottom navigation bar.`,
+    },
+    // Onboarding & Auth
+    {
+      label: "Onboarding",
+      icon: "🚀",
+      value: `App onboarding screen. Full-screen illustration with gradient background, 
+      bold headline and subtitle, dot pagination indicator, 
+      primary CTA button and skip link, smooth slide transition layout.`,
+    },
+    {
+      label: "Login Screen",
+      icon: "🔐",
+      value: `Login screen. App logo at top, email and password input fields with 
+      icons, forgot password link, primary sign in button, 
+      social login options (Google, Apple), sign up redirect link at bottom.`,
+    },
   ];
 
+  const cleanText = (text: string) => {
+    return text
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .join(" ");
+  };
+  
   const handleSuggestionClick = (val: string) => {
-    setPromptText(val);
+    setPromptText(cleanText(val));
   };
 
   const handleSubmit = () => {
@@ -89,20 +190,24 @@ function LandingScreen() {
               </div>
 
               {/** Static Suggestions */}
-              <div className="flex flex-wrap justify-center gap-2 px-5">
-                <Suggestions>
-                  {suggestions.map((s) => (
-                    <Suggestion
-                      key={s.label}
-                      suggestion={s.label}
-                      className="text-xs! h-7! px-2.5 pt-1!"
-                      onClick={() => handleSuggestionClick(s.value)}
-                    >
-                      {s.icon}
-                      <span>{s.label}</span>
-                    </Suggestion>
-                  ))}
-                </Suggestions>
+              <div className="relative w-full">
+                <div className="w-full flex flex-wrap justify-center gap-2 px-5">
+                  <Suggestions>
+                    {suggestions.map((s) => (
+                      <Suggestion
+                        key={s.label}
+                        suggestion={s.label}
+                        className="text-xs! h-7! px-2.5 pt-1!"
+                        onClick={() => handleSuggestionClick(s.value)}
+                      >
+                        {s.icon}
+                        <span>{s.label}</span>
+                      </Suggestion>
+                    ))}
+                  </Suggestions>
+                </div>
+                {/* Right fade indicator */}
+                <div className="absolute right-0 top-0 h-full w-12 bg-linear-to-l from-background to-transparent pointer-events-none" />
               </div>
             </div>
 
