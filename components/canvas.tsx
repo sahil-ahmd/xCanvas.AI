@@ -92,7 +92,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
   return (
     <>
       <div className="relative w-full h-full overflow-hidden">
-        <CanvasFloatingToolbar />
+        <CanvasFloatingToolbar projectId={projectId} />
 
         {currentStatus && <CanvasLoader status={currentStatus} />}
 
