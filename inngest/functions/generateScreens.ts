@@ -1,6 +1,6 @@
 import { openrouter } from "@/lib/openrouter";
 import { inngest } from "../client";
-import { success, z } from "zod";
+import { z } from "zod";
 import { FrameType } from "@/types/project";
 import { generateObject, generateText, stepCountIs } from "ai";
 import { ANALYSIS_PROMPT, GENERATION_SYSTEM_PROMPT } from "@/lib/prompt";
@@ -46,36 +46,49 @@ const AnalysisSchema = z.object({
 export const generateScreens = inngest.createFunction(
   { id: "generate-ui-screens" },
   { event: "ui/generate.screens" },
-  async ({ event, step }) => {
+  async ({ event, step, publish }) => {
     const {
       userId,
       projectId,
       prompt,
-
       frames,
       theme: existingTheme,
     } = event.data;
+
+    const CHANNEL = `user:${userId}`;
     const isExistingGeneration = Array.isArray(frames) && frames.length > 0;
 
-    // Analyze and Plan
+    // Notify client that generation has started
+    await publish({
+      channel: CHANNEL,
+      topic: "generation.start",
+      data: { status: "running", projectId },
+    });
+
+    // Step 1: Analyze the prompt and plan screens
     const analysis = await step.run("analyze-and-plan-screens", async () => {
+      // Notify client that analysis has started
+      await publish({
+        channel: CHANNEL,
+        topic: "analysis.start",
+        data: { status: "analyzing", projectId },
+      });
+
+      // For regeneration, pass existing HTML as context to the model
       const contextHTML = isExistingGeneration
-        ? frames
-            .slice(0, 4)
-            .map((frame: FrameType) => frame.htmlContent)
-            .join("\n")
+        ? frames.slice(0, 4).map((frame: FrameType) => frame.htmlContent).join("\n")
         : "";
 
+      // Build prompt based on whether this is a new or existing generation
       const analysisPrompt = isExistingGeneration
         ? `
-        USER REQUEST: ${prompt}
-        SELECTED THEME: ${existingTheme}
-        CONTEXT HTML: ${contextHTML}
+          USER REQUEST: ${prompt}
+          SELECTED THEME: ${existingTheme}
+          CONTEXT HTML: ${contextHTML}
         `.trim()
-        : `
-         USER REQUEST: ${prompt}
-        `.trim();
+        : `USER REQUEST: ${prompt}`.trim();
 
+      // Use Gemini to analyze the prompt and return structured screen plan + theme
       const { object } = await generateObject({
         model: openrouter.chat("google/gemini-2.5-flash-lite"),
         schema: AnalysisSchema,
@@ -83,93 +96,83 @@ export const generateScreens = inngest.createFunction(
         prompt: analysisPrompt,
       });
 
+      // For new generations, use the AI-selected theme; for regenerations, keep existing
       const themeToUse = isExistingGeneration ? existingTheme : object.theme;
 
+      // Persist the selected theme to the project on first generation
       if (!isExistingGeneration) {
         await prisma.project.update({
-          where: {
-            id: projectId,
-            userId: userId,
-          },
-          data: {
-            theme: themeToUse,
-          },
+          where: { id: projectId, userId },
+          data: { theme: themeToUse },
         });
       }
+
+      // Notify client that analysis is complete with screen plan details
+      await publish({
+        channel: CHANNEL,
+        topic: "analysis.complete",
+        data: {
+          status: "generating",
+          theme: themeToUse,
+          totalScreens: object.screens.length,
+          screens: object.screens,
+          projectId,
+        },
+      });
 
       return { ...object, themeToUse };
     });
 
-    // Actual generation of each screens
+    // Step 2: Generate HTML for each planned screen
     for (let i = 0; i < analysis.screens.length; i++) {
       const screenPlan = analysis.screens[i];
-      const selectedTheme = THEME_LIST.find(
-        (t) => t.id === analysis.themeToUse,
-      );
+      const selectedTheme = THEME_LIST.find((t) => t.id === analysis.themeToUse);
 
-      // Combine the theme styles + Base variable
+      // Merge base CSS variables with the selected theme styles
       const fullThemeCSS = `
-          ${BASE_VARIABLES}
-          ${selectedTheme?.style || ""}
-        `;
+        ${BASE_VARIABLES}
+        ${selectedTheme?.style || ""}
+      `;
 
       await step.run(`generated-screen-${i}`, async () => {
+        // Generate raw HTML for this screen using Gemini with Unsplash tool support
         const result = await generateText({
           model: openrouter.chat("google/gemini-2.5-flash-lite"),
           system: GENERATION_SYSTEM_PROMPT,
           tools: {
-            searchUnsplash: unsplashTool,
+            searchUnsplash: unsplashTool, // Allows model to fetch real images
           },
-          stopWhen: stepCountIs(5),
-          prompt: `
-            - Screen ${i + 1}/${analysis.screens.length}
-            - Screen ID: ${screenPlan.id}
-            - Screen Name: ${screenPlan.name}
-            - Screen Purpose: ${screenPlan.purpose}
-
-            VISUAL DESCRIPTION: ${screenPlan.visualDescription}
-            THEME STYLE (Use these for colors): ${fullThemeCSS}
-
-            CRITICAL REQUIREMENTS:
-            1. **Generate ONLY raw HTML markup for this mobile app screen using Tailwind CSS. **
-              Use Tailwind classes for layout, spacing, typography, shadows, etc.
-              Use theme CSS variables ONLY for color-related properties (bg-[var(--background)], text-[var(--foreground)], border-[var(--border)], ring-[var(--ring)], etc.)
-            2. **All content must be inside a single root <div> that controls the layout.**
-              - No overflow classes on the root.
-              - All scrollable content must be in inner containers with hidden scrolbars: [&::-webkit-scrollbar]:hidden scrollbar-none
-            3. **For absolute overlays (maps, bottom sheets, modals, etc.):**
-              - Use \`relative w-full h-screen\` on the top div of the overlay.
-            4. **For regular content:**
-              - Use \`w-full h-full min-h-screen\` on the top div.
-            5. **Do not use h-screen on inner content unless absolutely required.**
-              - Height must grow with content; content must be fully visible inside an iframe.
-            6. **For z-index layering:**
-              - Ensure absolute elements do not block other content unnecessarily.
-            7. **Output raw HTML only, starting with <div>.**
-              - Do not include markdown, comments, <html>, <body> or <head>.
-            8. **Hardcode a style only if a theme variable is not needed for that element.**
-            9. **Ensure iframe-friendly rendering:**
-              - All elements must contibute to the final scrollHeight so your parent iframe can correctly resize.
-            Generate the complete, production-ready HTML for this screen now
-          `.trim(),
+          stopWhen: stepCountIs(5), // Limit agentic tool call loops to 5 steps
+          prompt: `...`.trim(),
         });
 
+        // Extract and sanitize the HTML output from the model response
         let finalHtml = result.text ?? "";
         const match = finalHtml.match(/<div[\s\S]*<\/div>/);
         finalHtml = match ? match[0] : finalHtml;
-        finalHtml = finalHtml.replace(/```/g, "");
+        finalHtml = finalHtml.replace(/```/g, ""); // Strip any markdown code fences
 
-        // Create the frame
+        // Persist the generated screen as a Frame in the database
         const frame = await prisma.frame.create({
-          data: {
-            projectId,
-            title: screenPlan.name,
-            htmlContent: finalHtml,
-          },
+          data: { projectId, title: screenPlan.name, htmlContent: finalHtml },
         });
 
-        return { success: true, frame: frame };
+        // Notify client that a new frame is ready to render
+        await publish({
+          channel: CHANNEL,
+          topic: "frame.created",
+          data: { frame, screenId: screenPlan.id, projectId },
+        });
+
+        return { success: true, frame };
       });
     }
+
+    // Notify client that all screens have been generated
+    await publish({
+      channel: CHANNEL,
+      topic: "generation.completed",
+      data: { status: "completed", projectId },
+    });
   },
 );

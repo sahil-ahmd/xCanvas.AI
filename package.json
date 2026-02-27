@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@inngest/realtime": "^0.4.6",
     "@kinde-oss/kinde-auth-nextjs": "^2.11.0",
     "@openrouter/ai-sdk-provider": "^2.2.3",
     "@prisma/client": "^6.19.0",
