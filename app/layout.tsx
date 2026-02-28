@@ -3,6 +3,7 @@ import { Inter, Jost } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/context/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const jost = Jost({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -36,6 +37,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </QueryProvider>
       </body>

@@ -6,11 +6,15 @@ import { cn } from "@/lib/utils";
 import { ArrowLeftIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Header = ({ projectName }: { projectName?: string }) => {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const isDark = mounted ? theme === "dark" : false;
 
   return (
     <div className="sticky top-0">
