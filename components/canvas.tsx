@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { LoadingStatusType, useCanvas } from "@/context/canvas-provider";
 import CanvasLoader from "./canvas-loader";
@@ -82,19 +82,49 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
   const [currentScale, setCurrentScale] = useState<number>(0.53);
   const [openHtmlDialog, setOpenHtmlDialog] = useState<boolean>(false);
   const [isScreenShotting, setIsScreenShotting] = useState(false);
-  const canvasRootRef = useRef<HTMLDivElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const currentStatus: LoadingStatusType | "fetching" | null = isPending
-    ? "fetching"
-    : loadingStatus !== null &&
-        loadingStatus !== "idle" &&
-        loadingStatus !== "completed"
-      ? loadingStatus
-      : null;
+  const canvasRootRef = useRef<HTMLDivElement>(null);
 
   const onOpenHtmlDialog = () => {
     setOpenHtmlDialog(true);
   };
+
+  const saveThumbnailToProject = useCallback(
+    async (projectId: string | null) => {
+      try {
+        if (!projectId) return null;
+
+        const result = getCanvasHtmlContent();
+        if (!result?.html) return null;
+        setSelectedFrameId(null);
+        setIsSaving(true);
+
+        const response = await axios.post("/api/screenshot", {
+          html: result.html,
+          width: result.element.scrollWidth,
+          height: 700,
+          projectId,
+        });
+        if (response) {
+          console.log("Thumbnail saved", response.data);
+        }
+        toast.success("Thumbnail Saved!");
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to Screenshot the Canvas");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [setSelectedFrameId],
+  );
+
+  useEffect(() => {
+    if (!projectId) return;
+    if (loadingStatus !== "completed") return;
+    saveThumbnailToProject(projectId);
+  }, [loadingStatus, projectId, saveThumbnailToProject]);
 
   const handleScreenShot = useCallback(async () => {
     try {
@@ -170,6 +200,14 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
       `,
     };
   }
+
+  const currentStatus = isSaving
+    ? "finalizing"
+    : isPending
+    ? "fetching"
+    : loadingStatus !== "idle" && loadingStatus !== "completed"
+    ? loadingStatus
+    : null;
 
   return (
     <>

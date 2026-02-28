@@ -16,11 +16,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
 
 function Header() {
   const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
   const { user } = useKindeBrowserClient();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const isDark = mounted ? theme === "dark" : false;
 
   return (
     <div className="sticky top-0 right-0 left-0 z-30">
