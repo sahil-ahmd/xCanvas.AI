@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { LoadingStatusType, useCanvas } from "@/context/canvas-provider";
 import CanvasLoader from "./canvas-loader";
@@ -9,6 +9,8 @@ import CanvasControls from "./canvas-controls";
 import DeviceFrame from "./device-frame";
 import DeviceFrameSkeleton from "./frame-skeleton";
 import HtmlDialog from "./html-dialog";
+import { toast } from "sonner";
+import axios from "axios";
 
 const DEMO_HTML = `
 <div style="font-family: sans-serif; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
@@ -73,26 +75,148 @@ interface CanvasProps {
 }
 
 const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
-  const { theme, frames, selectedFrame, loadingStatus } = useCanvas();
+  const { theme, frames, selectedFrame, setSelectedFrameId, loadingStatus } =
+    useCanvas();
   const [toolMode, setToolMode] = useState<ToolModeType>(TOOL_MODE_ENUM.SELECT);
   const [zoomPercent, setZoomPercent] = useState<number>(53);
   const [currentScale, setCurrentScale] = useState<number>(0.53);
   const [openHtmlDialog, setOpenHtmlDialog] = useState<boolean>(false);
+  const [isScreenShotting, setIsScreenShotting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const currentStatus: LoadingStatusType | "fetching" | null = isPending
-  ? "fetching"
-  : loadingStatus !== null && loadingStatus !== "idle" && loadingStatus !== "completed"
-    ? loadingStatus
-    : null;
+  const canvasRootRef = useRef<HTMLDivElement>(null);
 
   const onOpenHtmlDialog = () => {
     setOpenHtmlDialog(true);
   };
 
+  const saveThumbnailToProject = useCallback(
+    async (projectId: string | null) => {
+      try {
+        if (!projectId) return null;
+
+        const result = getCanvasHtmlContent();
+        if (!result?.html) return null;
+        setSelectedFrameId(null);
+        setIsSaving(true);
+
+        const response = await axios.post("/api/screenshot", {
+          html: result.html,
+          width: result.element.scrollWidth,
+          height: 700,
+          projectId,
+        });
+        if (response) {
+          console.log("Thumbnail saved", response.data);
+        }
+        toast.success("Thumbnail Saved!");
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to Screenshot the Canvas");
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [setSelectedFrameId],
+  );
+
+  useEffect(() => {
+    if (!projectId) return;
+    if (loadingStatus !== "completed") return;
+    saveThumbnailToProject(projectId);
+  }, [loadingStatus, projectId, saveThumbnailToProject]);
+
+  const handleScreenShot = useCallback(async () => {
+    try {
+      const result = getCanvasHtmlContent();
+      if (!result?.html) {
+        toast.error("Failed to get canvas content");
+        return null;
+      }
+      setSelectedFrameId(null);
+      setIsScreenShotting(true);
+
+      const response = await axios.post(
+        "/api/screenshot",
+        {
+          html: result.html,
+          width: result.element.scrollWidth,
+          height: 700,
+        },
+        {
+          responseType: "blob",
+          validateStatus: (s) => (s >= 200 && s < 300) || s === 304,
+        },
+      );
+
+      const title = projectName || "Canvas";
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}.png`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Screenshot downloaded");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to Screenshot the Canvas");
+    } finally {
+      setIsScreenShotting(false);
+    }
+  }, [projectName, setSelectedFrameId]);
+
+  function getCanvasHtmlContent() {
+    const el = canvasRootRef.current;
+    if (!el) {
+      toast.error("Canvas element not found");
+      return null;
+    }
+    let styles = "";
+    for (const sheet of document.styleSheets) {
+      try {
+        for (const rule of sheet.cssRules) styles += rule.cssText;
+      } catch (error) {}
+    }
+
+    return {
+      element: el,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              margin: 0
+            }
+            * {
+              box-sizing: border-box
+            }
+            ${styles}
+          </style>
+        </head>
+        <body>${el.outerHTML}</body>
+        </html>
+      `,
+    };
+  }
+
+  const currentStatus = isSaving
+    ? "finalizing"
+    : isPending
+    ? "fetching"
+    : loadingStatus !== "idle" && loadingStatus !== "completed"
+    ? loadingStatus
+    : null;
+
   return (
     <>
       <div className="relative w-full h-full overflow-hidden">
-        <CanvasFloatingToolbar projectId={projectId} />
+        <CanvasFloatingToolbar
+          projectId={projectId}
+          isScreenShotting={isScreenShotting}
+          onScreenShot={handleScreenShot}
+        />
 
         {currentStatus && <CanvasLoader status={currentStatus} />}
 
@@ -120,6 +244,7 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
           {({ zoomIn, zoomOut }) => (
             <>
               <div
+                ref={canvasRootRef}
                 className={cn(
                   `absolute inset-0 w-full h-full bg-[#eee] dark:bg-[#242423] p-3`,
                   toolMode === TOOL_MODE_ENUM.HAND
@@ -153,10 +278,10 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                           <DeviceFrameSkeleton
                             key={index}
                             style={{
-                              transform: `translate(${baseX}px, 100px)`
+                              transform: `translate(${baseX}px, 100px)`,
                             }}
                           />
-                        )
+                        );
                       }
 
                       return (
@@ -165,10 +290,11 @@ const Canvas = ({ projectId, projectName, isPending }: CanvasProps) => {
                           frameId={frame.id}
                           title={frame.title}
                           html={frame.htmlContent}
+                          isLoading={frame.isLoading}
                           scale={currentScale}
-                          initialPosition={{ 
+                          initialPosition={{
                             x: baseX,
-                            y 
+                            y,
                           }}
                           toolMode={toolMode}
                           theme_style={theme?.style}
