@@ -9,17 +9,23 @@ import PromptInput from "./prompt-input";
 import { cn } from "@/lib/utils";
 import { parseThemeColors } from "@/lib/theme";
 import ThemeSelector from "./theme-selector";
-import { useGenerateDesignById } from "@/hooks/use-project-id";
+import { useGenerateDesignById, useUpdateProject } from "@/hooks/use-project-id";
 import { Spinner } from "./ui/spinner";
 
 const CanvasFloatingToolbar = ({ projectId }: { projectId: string }) => {
   const { themes, theme: currentTheme, setTheme } = useCanvas();
   const [promptText, setPromptText] = useState<string>("");
   const { mutate, isPending } = useGenerateDesignById(projectId);
+  const update = useUpdateProject(projectId);
 
   const handleAiGenerate = () => {
     if (!promptText) return;
     mutate(promptText);
+  };
+
+  const handleUpdate = () => {
+    if (!currentTheme) return;
+    update.mutate(currentTheme.id);
   };
 
   return (
@@ -104,9 +110,16 @@ const CanvasFloatingToolbar = ({ projectId }: { projectId: string }) => {
               variant="default"
               size="sm"
               className="rounded-full cursor-pointer"
+              onClick={handleUpdate}
             >
-              <Save className="size-4" />
-              Save
+              {update.isPending ? (
+                <Spinner />
+              ) : (
+                <>
+                  <Save className="size-4" />
+                  Save
+                </>
+              )}
             </Button>
           </div>
         </div>

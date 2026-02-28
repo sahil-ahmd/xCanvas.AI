@@ -28,3 +28,19 @@ export const useGenerateDesignById = (projectId: string) => {
     },
   });
 };
+
+export const useUpdateProject = (projectId: string) => {
+  return useMutation({
+    mutationFn: async (themeId: string) => {
+      const res = await axios.patch(`/api/project/${projectId}`, { themeId });
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Project Updated");
+    },
+    onError: (error) => {
+      console.log("Project failed", error);
+      toast.error("Failed to update project");
+    },
+  });
+};
