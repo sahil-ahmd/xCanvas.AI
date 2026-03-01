@@ -190,6 +190,22 @@ model Frame {
 
 ---
 
+## Screenshots
+<img width="2880" height="1766" alt="ss1" src="https://github.com/user-attachments/assets/9e06338b-c012-4c9a-a9e7-8a50461b612d" />
+<img width="2880" height="2258" alt="ss10" src="https://github.com/user-attachments/assets/8349c838-ad98-4071-846d-16d0ac043762" />
+<img width="2880" height="1556" alt="ss5" src="https://github.com/user-attachments/assets/d19ce530-347c-44fc-8ad7-71157c6d70aa" />
+<img width="2880" height="3294" alt="ss2" src="https://github.com/user-attachments/assets/bea6cfbe-b896-44d2-8c9c-5046f5e54bc4" />
+<img width="2880" height="1556" alt="ss3" src="https://github.com/user-attachments/assets/6dcfe0c0-5a70-416d-8310-a636335844b2" />
+<img width="2880" height="1556" alt="ss4" src="https://github.com/user-attachments/assets/33a55770-4bdf-42c6-a22c-e9f26a6247e6" />
+<img width="2880" height="1556" alt="ss6" src="https://github.com/user-attachments/assets/a13e7d94-ccc9-4210-b22b-073d7547bdd4" />
+<img width="2880" height="1556" alt="ss7" src="https://github.com/user-attachments/assets/cef3a9fc-fc5b-4cc2-8a56-8158d6d09e3f" />
+<img width="2880" height="1084" alt="ss8" src="https://github.com/user-attachments/assets/2dce2cb7-c7e2-4b8e-9a1b-2984a8331666" />
+<img width="2880" height="2258" alt="ss9" src="https://github.com/user-attachments/assets/2feb91e4-d312-4aff-8ae9-c7714b2fc5c8" />
+
+
+
+---
+
 ## Environment Variables
 
 ```env
