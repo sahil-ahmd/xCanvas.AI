@@ -126,14 +126,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const session = await getKindeServerSession();
-  const user = await session.getUser();
-  if (!user) throw new Error("Unauthorized");
+  try {
+    const { id } = await params;
+    const session = await getKindeServerSession();
+    const user = await session.getUser();
 
-  await prisma.project.delete({
-    where: { id, userId: user.id },
-  });
+    if (!user) throw new Error("Unauthorized");
 
-  return NextResponse.json({ success: true });
+    // Delete frames first (child records)
+    await prisma.frame.deleteMany({ where: { projectId: id } });
+
+    // Then delete the project
+    await prisma.project.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.log("Delete project error:", error);
+    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
+  }
 }
