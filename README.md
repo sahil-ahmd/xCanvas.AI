@@ -22,6 +22,64 @@
 
 ---
 
+## Features
+
+### 🎨 Canvas
+- Real-time dynamic canvas with zoom and pan
+- Multi-frame support — multiple screens side by side
+- Device frame wrapper for realistic mobile preview
+- Hand tool and select tool modes
+- Dot-grid background for professional canvas feel
+
+### 🤖 AI Generation
+- Generate mobile UI screens from natural language prompts
+- Powered by Gemini Flash Lite via OpenRouter
+- Background job processing via Inngest
+- Loading states with status indicators (fetching, generating, finalizing)
+
+### 📸 Screenshot & Thumbnail
+- Auto-save canvas thumbnail on generation complete
+- Manual screenshot download as PNG
+- Full CSS extraction for accurate capture
+- Puppeteer powered — chromium-min on Vercel, full puppeteer locally
+- Chromium path cached to avoid re-downloading on every request
+
+### 🎨 Theming
+- Multiple theme support with CSS variables
+- Apply and save theme per project
+- Light and dark mode toggle
+- Theme persists to database per project
+
+### 📁 Project Management
+- Create and name projects
+- Project cards with thumbnail preview
+- Relative timestamps (e.g. "2 hours ago")
+- Delete project with confirmation dialog
+- Auto-refresh project list after deletion
+
+### 🔐 Authentication
+- Kinde Auth — login, logout, session management
+- User avatar with dropdown menu
+- Protected API routes — all endpoints require auth
+- Per-user project isolation
+
+### 💾 Data Persistence
+- MongoDB via Prisma ORM
+- Project model — name, theme, thumbnail, frames
+- Frame model — title, htmlContent, linked to project
+- Child frames deleted before project (manual cascade)
+
+### 🖥️ UI & UX
+- shadcn/ui component library
+- Tailwind CSS styling
+- Fully responsive
+- Toast notifications for all actions
+- Confirm dialogs for destructive actions
+- Skeleton loaders while content loads
+- Hydration-safe theme toggle
+
+---
+
 ## Folder Structure
 
 ```
