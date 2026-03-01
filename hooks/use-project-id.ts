@@ -44,3 +44,14 @@ export const useUpdateProject = (projectId: string) => {
     },
   });
 };
+
+export const useDeleteProject = () => {
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      const res = await axios.delete(`/api/project/${projectId}`);
+      return res.data;
+    },
+    onSuccess: () => toast.success("Project deleted"),
+    onError: () => toast.error("Failed to delete project"),
+  });
+};

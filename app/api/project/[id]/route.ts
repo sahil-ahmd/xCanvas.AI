@@ -92,7 +92,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> },) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const { themeId } = await request.json();
@@ -123,4 +123,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       { status: 500 },
     );
   }
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const session = await getKindeServerSession();
+  const user = await session.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  await prisma.project.delete({
+    where: { id, userId: user.id },
+  });
+
+  return NextResponse.json({ success: true });
 }
